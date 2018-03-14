@@ -5,3 +5,6 @@
 
 2) beep
    control beep on x86 pc
+
+3) lib
+   contain some useful api
