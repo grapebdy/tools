@@ -5,7 +5,12 @@ function is_author() {
 	return $count
 }
 
-function caculate_code() {
+
+function result_summary() {
+	echo name added removed total | awk '{printf "\t%8s \t%10s \t%10s \t%10s\n", $1, $2, $3, $4}'
+}
+
+function caculate_specific() {
 
 	is_author $1
 	if [ $? -eq 0 ]
@@ -14,28 +19,32 @@ function caculate_code() {
 		return -1
 	fi
 
-	echo -n $1 | awk '{printf "%16s: ", $1}'
+	echo -n $1 | awk '{printf "%16s ", $1}'
 
 	git log --author $1 --pretty=tformat: --numstat  |
 		awk '{add += $1; subs += $2; loc += $1 - $2 }
-		END{printf "\t\tadded %s,\t removed %s,\t total %s\n", add, subs, loc}'
+		END{printf "\t%10s \t%10s \t%10s\n", add, subs, loc}'
 	return 0
 }
 
-author=`git shortlog --numbered --summary | awk '{printf $2"\n"}'`
+function author_all() {
+
+	author=`git shortlog --numbered --summary | awk '{printf $2"\n"}'`
+	for au in $author
+	do
+
+	caculate_specific $au
+
+	done
+}
+
 
 if [ $# -le 0 ]
 then
 	echo "all author summary:"
+	result_summary
+	author_all
 else
-	caculate_code $1
-	exit 0
+	result_summary
+	caculate_specific $1
 fi
-
-
-for au in $author
-do
-
-caculate_code $au
-
-done
