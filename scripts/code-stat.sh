@@ -6,6 +6,7 @@ function is_author() {
 }
 
 function caculate_code() {
+
 	is_author $1
 	if [ $? -eq 0 ]
 	then
@@ -13,10 +14,11 @@ function caculate_code() {
 		return -1
 	fi
 
-	echo -n $1": "
+	echo -n $1 | awk '{printf "%16s: ", $1}'
+
 	git log --author $1 --pretty=tformat: --numstat  |
 		awk '{add += $1; subs += $2; loc += $1 - $2 }
-		END{printf "added %s, removed %s, total %s\n", add, subs, loc}'
+		END{printf "\t\tadded %s,\t removed %s,\t total %s\n", add, subs, loc}'
 	return 0
 }
 
